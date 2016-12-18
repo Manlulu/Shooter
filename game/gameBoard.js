@@ -18,6 +18,7 @@ var Game = function (canvasId, context2d) {
         context.fillStyle = "#000";
         context.fillRect(0, 0, canvas.width, canvas.height);
         this.playerDirection = MovingDirection.IDLE;
+        this.gameLoop();
     };
 
     this.update = function () {
