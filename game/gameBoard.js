@@ -42,9 +42,13 @@ var Game = function (canvasId, context2d) {
     };
 
     this.gameLoop = function () {
+        this.loop();
+        setTimeout(this.gameLoop.bind(this), 1000 / 2);
+    };
+
+    this.loop = function(){
         this.update();
         this.draw();
-        setTimeout(this.gameLoop.bind(this), 1000 / 2);
     };
 
     this.calculatePlayerPos = function () {
@@ -70,7 +74,7 @@ var Game = function (canvasId, context2d) {
 
     this.drawPlayer = function () {
         context.fillStyle = "#FFF";
-        context.fillRect(canvas.width / 2 - this.player.getWidth() / 2, canvas.height - (this.player.getHeight() * 2), this.player.getWidth(), this.player.getHeight());
+        context.fillRect(this.player.getPosX(), canvas.height - (this.player.getHeight() * 2), this.player.getWidth(), this.player.getHeight());
     };
 
     this.drawText = function (text, font, width, height) {
@@ -84,11 +88,13 @@ var Game = function (canvasId, context2d) {
         switch (event.keyCode) {
             case 37:
                 self.playerDirection = MovingDirection.LEFT;
+                self.loop();
                 //checkPlayerMovement();
                 //draw();
                 break;
             case 39:
                 self.playerDirection = MovingDirection.RIGHT;
+                self.loop();
                 //checkPlayerMovement();
                 //draw();
                 break;
@@ -97,5 +103,4 @@ var Game = function (canvasId, context2d) {
                 break;
         }
     });
-
 };

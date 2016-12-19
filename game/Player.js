@@ -1,7 +1,7 @@
 var Player = function (width, height) {
     var width = width;
     var height = height;
-    this.posX = 0;
+    this.posX = 40;
     this.posY = 0;
 
     var privateVariable = "Er denne privat?";
