@@ -1,11 +1,3 @@
-var MovingDirection = {
-    LEFT: 0,
-    UP: 1,
-    RIGHT: 2,
-    DOWN: 3,
-    IDLE: 4
-};
-
 var State = {
     PAUSE: 0,
     PLAY: 1
@@ -28,17 +20,12 @@ var Game = function (canvasId, context2d) {
 
     this.startGame = function () {
         if (this.gameState === State.PAUSE) {
-            this.drawText("Shooter game", "30px verdana", canvas.width / 3, canvas.height / 4);
-            this.drawText("Press 'n' to start new game", "20px verdana", canvas.width / 3.5, canvas.height / 3);
+            DrawController.drawText(context, "Shooter game", "30px verdana", canvas.width / 3, canvas.height / 4, this.textColor);
+            DrawController.drawText(context, "Press 'n' to start new game", "20px verdana", canvas.width / 3.5, canvas.height / 3, this.textColor);
             setTimeout(this.startGame.bind(this), 1000 / 2);
         } else {
             this.gameLoop();
         }
-    };
-
-    this.update = function () {
-        this.calculatePlayerPos();
-        this.playerDirection = MovingDirection.IDLE;
     };
 
     this.gameLoop = function () {
@@ -46,61 +33,68 @@ var Game = function (canvasId, context2d) {
         setTimeout(this.gameLoop.bind(this), 1000 / 2);
     };
 
-    this.loop = function(){
+    this.loop = function () {
         this.update();
         this.draw();
     };
 
-    this.calculatePlayerPos = function () {
-        switch (this.playerDirection) {
-            case MovingDirection.LEFT:
-                this.player.setPosX(this.player.getPosX() - 10);
-                break;
-            case MovingDirection.RIGHT:
-                this.player.setPosX(this.player.getPosX() + 10);
-                break;
+    this.update = function () {
+        //   console.log("Enemy moving");
+    };
+
+    this.updatePlayer = function () {
+        if (!PlayerMovement.isPlayerIdle(this.playerDirection)) {
+            PlayerMovement.calculatePlayerPos(this.playerDirection, this.player);
+            this.draw();
+
+            setTimeout(this.updatePlayer.bind(this), 1000 / 60);
         }
     };
 
     this.draw = function () {
-        this.resetCanvas();
-        this.drawPlayer();
-    };
-
-    this.resetCanvas = function () {
-        context.fillStyle = "#000";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-    };
-
-    this.drawPlayer = function () {
-        context.fillStyle = "#FFF";
-        context.fillRect(this.player.getPosX(), canvas.height - (this.player.getHeight() * 2), this.player.getWidth(), this.player.getHeight());
-    };
-
-    this.drawText = function (text, font, width, height) {
-        context.fillStyle = this.textColor;
-        context.font = font;
-        context.fillText(text, width, height);
+        DrawController.resetCanvas(canvas, context);
+        DrawController.drawPlayer(canvas, context, this.player);
     };
 
     var self = this;
     document.addEventListener('keydown', function (event) {
-        switch (event.keyCode) {
-            case 37:
-                self.playerDirection = MovingDirection.LEFT;
-                self.loop();
-                //checkPlayerMovement();
-                //draw();
+        switch (self.gameState) {
+            case State.PAUSE:
+                if (event.keyCode == 78) {
+                    self.gameState = State.PLAY;
+                }
                 break;
-            case 39:
-                self.playerDirection = MovingDirection.RIGHT;
-                self.loop();
-                //checkPlayerMovement();
-                //draw();
-                break;
-            case 78:
-                self.gameState = State.PLAY;
+            case State.PLAY:
+                if (PlayerMovement.isPlayerIdle(self.playerDirection)) {
+                    self.setPlayerMovementDirection(event);
+                }
                 break;
         }
     });
+
+    this.setPlayerMovementDirection = function (event) {
+        switch (event.keyCode) {
+            case 37:
+                console.log("LEFT");
+                self.playerDirection = MovingDirection.LEFT;
+                self.updatePlayer();
+                break;
+            case 39:
+                console.log("RIGHT");
+                self.playerDirection = MovingDirection.RIGHT;
+                self.updatePlayer();
+                break;
+        }
+    };
+
+    document.addEventListener('keyup', function (event) {
+        if (event.keyCode === 37 && PlayerMovement.isMovingLeft(self.playerDirection)) {
+            console.log("LEFT EXIT");
+            self.playerDirection = MovingDirection.IDLE;
+        }
+        else if (event.keyCode === 39 && PlayerMovement.isMovingRight(self.playerDirection)) {
+            console.log("RIGHT EXIT");
+            self.playerDirection = MovingDirection.IDLE;
+        }
+    })
 };
