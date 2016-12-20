@@ -1,8 +1,3 @@
-var State = {
-    PAUSE: 0,
-    PLAY: 1
-};
-
 var Game = function () {
     var canvas, context;
     var textColor;

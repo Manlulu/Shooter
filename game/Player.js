@@ -9,10 +9,6 @@ var Player = function (width, height) {
         return privateVariable;
     };
 
-    this.loadVeapon = function () {
-        console.log("Player: Loading weapon");
-    };
-
     this.getWidth = function () {
         return width;
     };
