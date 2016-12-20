@@ -1,6 +1,3 @@
-var game = new Game("game_board", "2d");
-game.init();
-//game.gameLoop();
+var game = new Game();
+game.init("game_board", "2d");
 game.startGame();
-//game.update();
-//game.draw();

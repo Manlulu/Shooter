@@ -3,98 +3,112 @@ var State = {
     PLAY: 1
 };
 
-var Game = function (canvasId, context2d) {
-    var canvas = document.getElementById(canvasId);
-    var context = canvas.getContext(context2d);
-    this.textColor = "#fff";
-    this.player = new Player(90, 30);
-    this.playerDirection = {};
-    this.gameState = State.PAUSE;
+var Game = function () {
+    var canvas, context;
+    var textColor;
+    var player, playerDirection, playerSpeed;
+    var gameState;
 
-    this.init = function () {
-        context.fillStyle = "#000";
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        this.playerDirection = MovingDirection.IDLE;
+    var fpsInterval, startTime, now, then, timeSinceLastLoop;
 
+    const keyLeft = 37;
+    const keyRight = 39;
+    const keyN = 78;
+    const txtGameName = "Shooter game";
+    const txtNewGame = "Press 'n' to start new game";
+
+    this.init = function (canvasId, context2d) {
+        canvas = document.getElementById(canvasId);
+        context = canvas.getContext(context2d);
+        DrawController.resetCanvas(canvas, context);
+        textColor = "#fff";
+        playerSpeed = 10;
+        player = new Player(90, 30);
+        playerDirection = MovingDirection.IDLE;
+        gameState = State.PAUSE;
     };
 
     this.startGame = function () {
-        if (this.gameState === State.PAUSE) {
-            DrawController.drawText(context, "Shooter game", "30px verdana", canvas.width / 3, canvas.height / 4, this.textColor);
-            DrawController.drawText(context, "Press 'n' to start new game", "20px verdana", canvas.width / 3.5, canvas.height / 3, this.textColor);
+        if (gameState === State.PAUSE) {
+            DrawController.drawText(context, txtGameName, "30px verdana", canvas.width / 3, canvas.height / 4, textColor);
+            DrawController.drawText(context, txtNewGame, "20px verdana", canvas.width / 3.5, canvas.height / 3, textColor);
             setTimeout(this.startGame.bind(this), 1000 / 2);
         } else {
-            this.gameLoop();
+            initGameLoop(60);
         }
     };
 
-    this.gameLoop = function () {
-        this.loop();
-        setTimeout(this.gameLoop.bind(this), 1000 / 2);
-    };
+    function initGameLoop(fps) {
+        fpsInterval = 1000 / fps;
+        then = Date.now();
+        startTime = then;
+        gameLoop();
+    }
 
-    this.loop = function () {
-        this.update();
-        this.draw();
-    };
+    var gameLoop = function () {
+        requestAnimationFrame(gameLoop);
 
-    this.update = function () {
-        //   console.log("Enemy moving");
-    };
+        now = Date.now();
+        timeSinceLastLoop = now - then;
 
-    this.updatePlayer = function () {
-        if (!PlayerMovement.isPlayerIdle(this.playerDirection)) {
-            PlayerMovement.calculatePlayerPos(this.playerDirection, this.player);
-            this.draw();
-
-            setTimeout(this.updatePlayer.bind(this), 1000 / 60);
+        if (timeSinceLastLoop > fpsInterval) {
+            then = now - timeSinceLastLoop;
+            loop();
         }
     };
 
-    this.draw = function () {
+    var loop = function () {
+        update();
+        draw();
+    };
+
+    var update = function () {
+        updatePlayer();
+    };
+
+    var updatePlayer = function () {
+        if (!PlayerMovement.canPlayerGoLeft(player) && PlayerMovement.isMovingLeft(playerDirection)) {
+        } else if (!PlayerMovement.canPlayerGoRight(player, canvas) && PlayerMovement.isMovingRight(playerDirection)) {
+        } else {
+            PlayerMovement.movePlayer(playerDirection, player, playerSpeed);
+        }
+    };
+
+    var draw = function () {
         DrawController.resetCanvas(canvas, context);
-        DrawController.drawPlayer(canvas, context, this.player);
+        DrawController.drawPlayer(canvas, context, player);
     };
 
-    var self = this;
     document.addEventListener('keydown', function (event) {
-        switch (self.gameState) {
+        switch (gameState) {
             case State.PAUSE:
-                if (event.keyCode == 78) {
-                    self.gameState = State.PLAY;
+                if (event.keyCode == keyN) {
+                    gameState = State.PLAY;
                 }
                 break;
             case State.PLAY:
-                if (PlayerMovement.isPlayerIdle(self.playerDirection)) {
-                    self.setPlayerMovementDirection(event);
-                }
+                setPlayerMovementDirection(event);
                 break;
         }
     });
 
-    this.setPlayerMovementDirection = function (event) {
+    var setPlayerMovementDirection = function (event) {
         switch (event.keyCode) {
-            case 37:
-                console.log("LEFT");
-                self.playerDirection = MovingDirection.LEFT;
-                self.updatePlayer();
+            case keyLeft:
+                playerDirection = MovingDirection.LEFT;
                 break;
-            case 39:
-                console.log("RIGHT");
-                self.playerDirection = MovingDirection.RIGHT;
-                self.updatePlayer();
+            case keyRight:
+                playerDirection = MovingDirection.RIGHT;
                 break;
         }
     };
 
     document.addEventListener('keyup', function (event) {
-        if (event.keyCode === 37 && PlayerMovement.isMovingLeft(self.playerDirection)) {
-            console.log("LEFT EXIT");
-            self.playerDirection = MovingDirection.IDLE;
+        if (event.keyCode === keyLeft && PlayerMovement.isMovingLeft(playerDirection)) {
+            playerDirection = MovingDirection.IDLE;
         }
-        else if (event.keyCode === 39 && PlayerMovement.isMovingRight(self.playerDirection)) {
-            console.log("RIGHT EXIT");
-            self.playerDirection = MovingDirection.IDLE;
+        else if (event.keyCode === keyRight && PlayerMovement.isMovingRight(playerDirection)) {
+            playerDirection = MovingDirection.IDLE;
         }
     })
 };

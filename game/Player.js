@@ -45,7 +45,6 @@ var Player = function (width, height) {
         this.posY = posY;
     };
 };
-// Blir delt av alle Player objekt.
 Player.prototype.shoot = function () {
     console.log("Player: bang bang");
 };

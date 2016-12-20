@@ -11,13 +11,21 @@ PlayerMovement = {
         return playerDirection === MovingDirection.IDLE;
     },
 
-    calculatePlayerPos: function (playerDirection, player) {
+    canPlayerGoLeft: function(player){
+        return player.getPosX() > 0;
+    },
+
+    canPlayerGoRight: function(player, canvas){
+        return player.getPosX() < (canvas.width - player.getWidth());
+    },
+
+    movePlayer: function (playerDirection, player, speed) {
         switch (playerDirection) {
             case MovingDirection.LEFT:
-                player.setPosX(player.getPosX() - 10);
+                player.setPosX(player.getPosX() - speed);
                 break;
             case MovingDirection.RIGHT:
-                player.setPosX(player.getPosX() + 10);
+                player.setPosX(player.getPosX() + speed);
                 break;
         }
     }
