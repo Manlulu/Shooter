@@ -1,6 +1,6 @@
 var Player = function (width, height) {
-    var width = width;
-    var height = height;
+    this.width = width;
+    this.height = height;
     this.posX = 40;
     this.posY = 0;
 
@@ -9,7 +9,6 @@ var Player = function (width, height) {
         return privateVariable;
     };
 
-    // Blir opprettet for hvert objekt.
     this.loadVeapon = function () {
         console.log("Player: Loading weapon");
     };
