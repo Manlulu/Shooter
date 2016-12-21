@@ -3,12 +3,18 @@ var Game = function () {
     var textColor;
     var player, playerDirection, playerSpeed;
     var gameState;
+    var playerState;
+    var autoFireTimer = 0;
+
+    var audioPlayerShoot = new Audio("laser.mp3");
+
 
     var fpsInterval, startTime, now, then, timeSinceLastLoop;
 
-    const keyLeft = 37;
-    const keyRight = 39;
-    const keyN = 78;
+    const KEY_LEFT = 37;
+    const KEY_RIGHT = 39;
+    const KEY_N = 78;
+    const KEY_SPACE = 32;
     const txtGameName = "Shooter game";
     const txtNewGame = "Press 'n' to start new game";
 
@@ -21,6 +27,7 @@ var Game = function () {
         player = new Player(90, 30);
         playerDirection = MovingDirection.IDLE;
         gameState = State.PAUSE;
+        playerState = PlayerState.IDLE;
 
         // Finn ut mer om denne.
         // Sånn at den ikke fortsetter på det den dreiv å tegner på forrige loop.
@@ -51,7 +58,7 @@ var Game = function () {
         timeSinceLastLoop = now - then;
 
         if (timeSinceLastLoop > fpsInterval) {
-            then = now - timeSinceLastLoop;
+            then = now - (timeSinceLastLoop % fpsInterval);
             loop();
         }
     };
@@ -62,10 +69,33 @@ var Game = function () {
     };
 
     var update = function () {
-        updatePlayer();
+        updatePlayerPosition();
+        updatePlayerFire();
     };
 
-    var updatePlayer = function () {
+    var updatePlayerFire = function () {
+        if(playerState == PlayerState.FIRE && player.getAutoFireReady()){
+            player.fire();
+            audioPlayerShoot.play();
+            player.setAutoFireReady(false);
+        }
+
+        if(autoFireTimer >= 50){
+            resetAutoFireTimer();
+            player.setAutoFireReady(true);
+        }
+        incrementAutoFireTimer();
+    };
+
+    var resetAutoFireTimer = function(){
+        autoFireTimer = 0;
+    };
+
+    var incrementAutoFireTimer = function () {
+        autoFireTimer++;
+    };
+
+    var updatePlayerPosition = function () {
         if (!PlayerMovement.canPlayerGoLeft(player) && PlayerMovement.isMovingLeft(playerDirection)) {
         } else if (!PlayerMovement.canPlayerGoRight(player, canvas) && PlayerMovement.isMovingRight(playerDirection)) {
         } else {
@@ -81,24 +111,25 @@ var Game = function () {
     document.addEventListener('keydown', function (event) {
         switch (gameState) {
             case State.PAUSE:
-                if (event.keyCode == keyN) {
+                if (event.keyCode == KEY_N) {
                     gameState = State.PLAY;
                 }
                 break;
             case State.PLAY:
-                if(setPlayerMovementDirection(event)){
+                if (setPlayerMovementDirection(event)) {
                     break;
                 }
-                if(playerIsFireing(event)){
+                if (playerIsFireing(event)) {
                     break;
                 }
                 break;
         }
     });
 
-    var playerIsFireing = function(event){
-        if(event.keyCode == 32){
-            player.fire();
+    var playerIsFireing = function (event) {
+        if (event.keyCode ==  KEY_SPACE && playerState != PlayerState.FIRE) {
+            playerState = PlayerState.FIRE;
+
             return true;
         }
         return false;
@@ -106,10 +137,10 @@ var Game = function () {
 
     var setPlayerMovementDirection = function (event) {
         switch (event.keyCode) {
-            case keyLeft:
+            case KEY_LEFT:
                 playerDirection = MovingDirection.LEFT;
                 return true;
-            case keyRight:
+            case KEY_RIGHT:
                 playerDirection = MovingDirection.RIGHT;
                 return true;
         }
@@ -117,11 +148,15 @@ var Game = function () {
     };
 
     document.addEventListener('keyup', function (event) {
-        if (event.keyCode === keyLeft && PlayerMovement.isMovingLeft(playerDirection)) {
+        if (event.keyCode === KEY_LEFT && PlayerMovement.isMovingLeft(playerDirection)) {
             playerDirection = MovingDirection.IDLE;
         }
-        else if (event.keyCode === keyRight && PlayerMovement.isMovingRight(playerDirection)) {
+        else if (event.keyCode === KEY_RIGHT && PlayerMovement.isMovingRight(playerDirection)) {
             playerDirection = MovingDirection.IDLE;
+        } else if(event.keyCode == KEY_SPACE){
+            playerState = PlayerState.IDLE;
+            player.setAutoFireReady(true)
+            resetAutoFireTimer();
         }
     })
 };

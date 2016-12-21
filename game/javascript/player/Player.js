@@ -1,10 +1,19 @@
+var PlayerState = {
+    IDLE: 0,
+    MOVING: 1,
+    FIRE: 2
+};
+
 var Player = function (width, height) {
     this.width = width;
     this.height = height;
     this.posX = 40;
     this.posY = 0;
+    this.autoFire = true;
+    this.autoFireTimer = 50;
 
     var privateVariable = "Er denne privat?";
+
     this.getPrivate = function () {
         return privateVariable;
     };
@@ -40,9 +49,21 @@ var Player = function (width, height) {
         this.posY = posY;
     };
 
+    this.getAutoFireReady = function(){
+        return this.autoFire;
+    };
+
+    this.setAutoFireReady = function(autoFire){
+        this.autoFire = autoFire;
+    };
+
     this.fire = function(){
         console.log("Pew pew");
-    }
+    };
+
+    this.getAutoFireTimer = function(){
+        return this.autoFireTimer;
+    };
 };
 Player.prototype.shoot = function () {
     console.log("Player: bang bang");
