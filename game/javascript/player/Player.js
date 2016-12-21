@@ -39,6 +39,10 @@ var Player = function (width, height) {
     this.setPosY = function(posY){
         this.posY = posY;
     };
+
+    this.fire = function(){
+        console.log("Pew pew");
+    }
 };
 Player.prototype.shoot = function () {
     console.log("Player: bang bang");

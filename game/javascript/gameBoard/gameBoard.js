@@ -21,6 +21,10 @@ var Game = function () {
         player = new Player(90, 30);
         playerDirection = MovingDirection.IDLE;
         gameState = State.PAUSE;
+
+        // Finn ut mer om denne.
+        // Sånn at den ikke fortsetter på det den dreiv å tegner på forrige loop.
+        context.beginPath();
     };
 
     this.startGame = function () {
@@ -82,20 +86,34 @@ var Game = function () {
                 }
                 break;
             case State.PLAY:
-                setPlayerMovementDirection(event);
+                if(setPlayerMovementDirection(event)){
+                    break;
+                }
+                if(playerIsFireing(event)){
+                    break;
+                }
                 break;
         }
     });
+
+    var playerIsFireing = function(event){
+        if(event.keyCode == 32){
+            player.fire();
+            return true;
+        }
+        return false;
+    };
 
     var setPlayerMovementDirection = function (event) {
         switch (event.keyCode) {
             case keyLeft:
                 playerDirection = MovingDirection.LEFT;
-                break;
+                return true;
             case keyRight:
                 playerDirection = MovingDirection.RIGHT;
-                break;
+                return true;
         }
+        return false;
     };
 
     document.addEventListener('keyup', function (event) {
