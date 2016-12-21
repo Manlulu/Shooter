@@ -74,10 +74,14 @@ var Game = function () {
     };
 
     var updatePlayerFire = function () {
+        console.log(playerState );
+        console.log(player.getAutoFireReady());
+        console.log("Timer: " + autoFireTimer);
         if(playerState == PlayerState.FIRE && player.getAutoFireReady()){
             player.fire();
             audioPlayerShoot.play();
             player.setAutoFireReady(false);
+            resetAutoFireTimer();
         }
 
         if(autoFireTimer >= 50){
