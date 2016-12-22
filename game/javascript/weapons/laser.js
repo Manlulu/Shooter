@@ -23,6 +23,7 @@ var Laser = function (startPosX, startPosY, canvas) {
     this.isOutOfScreen = function(){
         return this.state == LaserState.OUT_OF_SCREEN;
     }
+
     this.stateIsMoving = function(){
         return this.state == LaserState.MOVING;
     };

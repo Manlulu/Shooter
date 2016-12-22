@@ -73,7 +73,12 @@ var Game = function () {
     var update = function () {
         updatePlayerPosition();
         updatePlayerFire();
+        checkLaserPosition();
         updateLaserPosition();
+    };
+
+    var updateLaserPosition = function () {
+        WeaponsMovement.moveWeapon(lasers, 4);
     };
 
     var updatePlayerFire = function () {
@@ -84,7 +89,7 @@ var Game = function () {
             player.setAutoFireReady(false);
             resetAutoFireTimer();
 
-            lasers.push(new Laser((player.getPosX() + (player.getWidth() / 2)), player.getPosY(), canvas));
+            loadLaser();
         }
 
         if (autoFireTimer >= 50) {
@@ -94,7 +99,11 @@ var Game = function () {
         incrementAutoFireTimer();
     };
 
-    var playPlayerLaserSound = function(){
+    var loadLaser = function () {
+        lasers.push(new Laser((player.getPosX() + (player.getWidth() / 2)), player.getPosY(), canvas));
+    };
+
+    var playPlayerLaserSound = function () {
         audioPlayerShoot.pause();
         audioPlayerShoot.currentTime = 0;
         audioPlayerShoot.play();
@@ -108,21 +117,20 @@ var Game = function () {
         autoFireTimer++;
     };
 
-    var updateLaserPosition = function () {
-        for (var a = 0; a < lasers.length; a++) {
-            if (lasers[a] != null) {
-                if (lasers[a].getPosY() == (-canvas.height)) {
-                    lasers[a].outOfScreen();
-                }
-                lasers[a].setPosY(lasers[a].getPosY() - 4);
-                if (lasers[a].isOutOfScreen()) {
-                    lasers[a] = null;
-                    lasers.splice(0, 1);
-                    console.log("lasers.length: " + lasers.length)
-                }
+    var checkLaserPosition = function () {
+        for (var i = 0; i < lasers.length; i++) {
+            if (isOutOfScreen(i)) {
+                lasers[i] = null;
+                lasers.splice(0, 1);
+                console.log("lasers.length: " + lasers.length)
             }
         }
     };
+
+    var isOutOfScreen = function (pos) {
+        return lasers[pos].getPosY() == (-canvas.height);
+    };
+
     var updatePlayerPosition = function () {
         if (!PlayerMovement.canPlayerGoLeft(player) && PlayerMovement.isMovingLeft(playerDirection)) {
         } else if (!PlayerMovement.canPlayerGoRight(player, canvas) && PlayerMovement.isMovingRight(playerDirection)) {
