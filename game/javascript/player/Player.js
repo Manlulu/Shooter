@@ -58,7 +58,7 @@ var Player = function (width, height) {
     };
 
     this.fire = function(){
-        console.log("Pew pew");
+        // console.log("Pew pew");
     };
 
     this.getAutoFireTimer = function(){

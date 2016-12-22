@@ -6,6 +6,9 @@ var Game = function () {
     var playerState;
     var autoFireTimer = 0;
 
+    // var laser;
+    var lasers = [];
+
     var audioPlayerShoot = new Audio("laser.mp3");
 
     var fpsInterval, startTime, now, then, timeSinceLastLoop;
@@ -70,26 +73,28 @@ var Game = function () {
     var update = function () {
         updatePlayerPosition();
         updatePlayerFire();
+        updateLaserPosition();
     };
 
     var updatePlayerFire = function () {
-        if(playerState == PlayerState.FIRE && player.getAutoFireReady()){
+        if (playerState == PlayerState.FIRE && player.getAutoFireReady()) {
             player.fire();
             audioPlayerShoot.play();
             player.setAutoFireReady(false);
             resetAutoFireTimer();
+            console.log("Fire");
+            lasers.push(new Laser((player.getPosX() + (player.getWidth() / 2)), player.getPosY(), canvas));
 
-            var laser = new Laser(player.getPosX(), player.getPosY(), canvas);
         }
 
-        if(autoFireTimer >= 50){
+        if (autoFireTimer >= 50) {
             resetAutoFireTimer();
             player.setAutoFireReady(true);
         }
         incrementAutoFireTimer();
     };
 
-    var resetAutoFireTimer = function(){
+    var resetAutoFireTimer = function () {
         autoFireTimer = 0;
     };
 
@@ -97,6 +102,21 @@ var Game = function () {
         autoFireTimer++;
     };
 
+    var updateLaserPosition = function () {
+        for (var a = 0; a < lasers.length; a++) {
+            if (lasers[a] != null) {
+                if (lasers[a].getPosY() == (-canvas.height)) {
+                    lasers[a].outOfScreen();
+                }
+                lasers[a].setPosY(lasers[a].getPosY() - 4);
+                if (lasers[a].isOutOfScreen()) {
+                    lasers[a] = null;
+                    lasers.splice(0, 1);
+                    console.log("lasers.length: " + lasers.length)
+                }
+            }
+        }
+    };
     var updatePlayerPosition = function () {
         if (!PlayerMovement.canPlayerGoLeft(player) && PlayerMovement.isMovingLeft(playerDirection)) {
         } else if (!PlayerMovement.canPlayerGoRight(player, canvas) && PlayerMovement.isMovingRight(playerDirection)) {
@@ -108,7 +128,12 @@ var Game = function () {
     var draw = function () {
         DrawController.resetCanvas(canvas, context);
         DrawController.drawPlayer(canvas, context, player);
+        for (var a = 0; a < lasers.length; a++) {
+            if (lasers[a] != null && lasers[a].stateIsMoving())
+                DrawController.drawLaser(canvas, context, lasers[a], player);
+        }
     };
+
 
     document.addEventListener('keydown', function (event) {
         switch (gameState) {
@@ -129,7 +154,7 @@ var Game = function () {
     });
 
     var playerIsFireing = function (event) {
-        if (event.keyCode ==  KEY_SPACE && playerState != PlayerState.FIRE) {
+        if (event.keyCode == KEY_SPACE && playerState != PlayerState.FIRE) {
             playerState = PlayerState.FIRE;
 
             return true;
@@ -155,7 +180,7 @@ var Game = function () {
         }
         else if (event.keyCode === KEY_RIGHT && PlayerMovement.isMovingRight(playerDirection)) {
             playerDirection = MovingDirection.IDLE;
-        } else if(event.keyCode == KEY_SPACE){
+        } else if (event.keyCode == KEY_SPACE) {
             playerState = PlayerState.IDLE;
             player.setAutoFireReady(true)
             resetAutoFireTimer();

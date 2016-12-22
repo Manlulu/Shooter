@@ -11,5 +11,9 @@ DrawController = {
         context.fillStyle = textColor;
         context.font = font;
         context.fillText(text, width, height);
+    },
+    drawLaser: function(canvas, context, laser, player){
+        context.fillStyle = "#FFF";
+        context.fillRect(laser.getPosX(), (canvas.height - (player.getHeight() * 2)) + laser.getPosY(), 3, 15);
     }
 };
