@@ -79,12 +79,12 @@ var Game = function () {
     var updatePlayerFire = function () {
         if (playerState == PlayerState.FIRE && player.getAutoFireReady()) {
             player.fire();
-            audioPlayerShoot.play();
+            playPlayerLaserSound();
+
             player.setAutoFireReady(false);
             resetAutoFireTimer();
-            console.log("Fire");
-            lasers.push(new Laser((player.getPosX() + (player.getWidth() / 2)), player.getPosY(), canvas));
 
+            lasers.push(new Laser((player.getPosX() + (player.getWidth() / 2)), player.getPosY(), canvas));
         }
 
         if (autoFireTimer >= 50) {
@@ -92,6 +92,12 @@ var Game = function () {
             player.setAutoFireReady(true);
         }
         incrementAutoFireTimer();
+    };
+
+    var playPlayerLaserSound = function(){
+        audioPlayerShoot.pause();
+        audioPlayerShoot.currentTime = 0;
+        audioPlayerShoot.play();
     };
 
     var resetAutoFireTimer = function () {
