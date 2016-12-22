@@ -196,7 +196,7 @@ var Game = function () {
             playerDirection = MovingDirection.IDLE;
         } else if (event.keyCode == KEY_SPACE) {
             playerState = PlayerState.IDLE;
-            player.setAutoFireReady(true)
+            player.setAutoFireReady(true);
             resetAutoFireTimer();
         }
     })
