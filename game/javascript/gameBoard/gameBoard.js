@@ -8,7 +8,6 @@ var Game = function () {
 
     var audioPlayerShoot = new Audio("laser.mp3");
 
-
     var fpsInterval, startTime, now, then, timeSinceLastLoop;
 
     const KEY_LEFT = 37;
@@ -79,6 +78,8 @@ var Game = function () {
             audioPlayerShoot.play();
             player.setAutoFireReady(false);
             resetAutoFireTimer();
+
+            var laser = new Laser(player.getPosX(), player.getPosY(), canvas);
         }
 
         if(autoFireTimer >= 50){
