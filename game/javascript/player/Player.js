@@ -8,7 +8,7 @@ var Player = function (width, height) {
     this.width = width;
     this.height = height;
     this.posX = 40;
-    this.posY = 0;
+    this.posY = 550;
     this.autoFire = true;
     this.autoFireTimer = 50;
 

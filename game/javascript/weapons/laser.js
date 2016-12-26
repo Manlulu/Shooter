@@ -9,6 +9,8 @@ var Laser = function (startPosX, startPosY, canvas) {
     this.posX = startPosX;
     this.canvas = canvas;
     this.state = LaserState.MOVING;
+    this.width = 3;
+    this.height = 15;
 
     this.init = function(){
         this.desideShooter();
@@ -50,4 +52,10 @@ var Laser = function (startPosX, startPosY, canvas) {
     this.setPosY = function(posY){
         this.posY = posY;
     };
+    this.getWidth = function(){
+        return this.width;
+    }
+    this.getHeight = function(){
+        return this.height;
+    }
 };
