@@ -5,10 +5,11 @@ var Game = function () {
         var gameState;
         var playerState;
         var autoFireTimer = 0;
+        var enemyTimer = Math.floor(Math.random() * 200) + 100;
 
-        var lasers = [];
+
+        var laserList = [];
         var enemyList = [];
-        var enemy;
 
         var audioPlayerShoot = new Audio("laser.mp3")
         var explosionSound = new Audio("explosion.mp3");
@@ -29,7 +30,6 @@ var Game = function () {
             textColor = "#fff";
             playerSpeed = 10;
             player = new Player(90, 30);
-            enemy = new Enemy(100, 30, 40, 10);
             playerDirection = MovingDirection.IDLE;
             gameState = State.PAUSE;
             playerState = PlayerState.IDLE;
@@ -81,39 +81,42 @@ var Game = function () {
             updateEnemy();
         };
 
-        var enemyTimer = Math.floor(Math.random() * 200) + 100;
         var updateEnemy = function () {
+            spawnEnemy();
+            setEnemyPosition();
+            checkEnemyHitByLaser();
+        };
+
+        var spawnEnemy = function(){
             enemyTimer--;
-            // Spawn enemy
             enemyTimer = EnemyController.spawnEnemy(enemyList, enemyTimer);
+        };
 
-            // Set enemy position
+        var checkEnemyHitByLaser = function(){
             for (var i = 0; i < enemyList.length; i++) {
-                EnemyController.setEnemyPosition(enemyList[i]);
-                if (EnemyController.isOutOfScreen(enemyList[i], canvas)) {
-                    EnemyController.removeEnemy(enemyList, i);
-                    console.log("Enemies.length: " + enemyList.length)
-                }
-            }
-
-            // Check enemy hit by laser
-            for (var i = 0; i < enemyList.length; i++) {
-                for (var y = 0; y < lasers.length; y++) {
-                    if (EnemyController.checkEnemyHit(enemyList[i], lasers[y])) {
+                for (var y = 0; y < laserList.length; y++) {
+                    if (EnemyController.checkEnemyHit(enemyList[i], laserList[y])) {
                         EnemyController.removeEnemy(enemyList, i);
-                        WeaponsMovement.removeLaser(lasers, y);
+                        WeaponsMovement.removeLaser(laserList, y);
 
                         playSound(explosionSound);
-
                         break;
-
                     }
                 }
             }
         };
 
+        var setEnemyPosition = function(){
+            for (var i = 0; i < enemyList.length; i++) {
+                EnemyController.setEnemyPosition(enemyList[i]);
+                if (EnemyController.isOutOfScreen(enemyList[i], canvas)) {
+                    EnemyController.removeEnemy(enemyList, i);
+                }
+            }
+        };
+
         var updateLaserPosition = function () {
-            WeaponsMovement.moveWeapon(lasers, 4);
+            WeaponsMovement.moveWeapon(laserList, 4);
         };
 
         var updatePlayerFire = function () {
@@ -135,7 +138,7 @@ var Game = function () {
         };
 
         var loadLaser = function () {
-            lasers.push(new Laser((player.getPosX() + (player.getWidth() / 2)), player.getPosY(), canvas));
+            laserList.push(new Laser((player.getPosX() + (player.getWidth() / 2)), player.getPosY(), canvas));
         };
 
         var playSound = function (sound) {
@@ -153,16 +156,16 @@ var Game = function () {
         };
 
         var checkLaserPosition = function () {
-            for (var i = 0; i < lasers.length; i++) {
+            for (var i = 0; i < laserList.length; i++) {
                 if (isOutOfScreen(i)) {
-                    WeaponsMovement.removeLaser(lasers, i);
-                    console.log("lasers.length: " + lasers.length)
+                    WeaponsMovement.removeLaser(laserList, i);
+                    console.log("laserList.length: " + laserList.length)
                 }
             }
         };
 
         var isOutOfScreen = function (pos) {
-            return lasers[pos].getPosY() <= 0;
+            return laserList[pos].getPosY() <= 0;
         };
 
         var updatePlayerPosition = function () {
@@ -176,16 +179,15 @@ var Game = function () {
         var draw = function () {
             DrawController.resetCanvas(canvas, context);
             DrawController.drawPlayer(canvas, context, player);
-            for (var a = 0; a < lasers.length; a++) {
-                if (lasers[a] != null && lasers[a].stateIsMoving())
-                    DrawController.drawLaser(canvas, context, lasers[a]);
+            for (var a = 0; a < laserList.length; a++) {
+                if (laserList[a] != null && laserList[a].stateIsMoving())
+                    DrawController.drawLaser(canvas, context, laserList[a]);
             }
 
             for (var i = 0; i < enemyList.length; i++) {
                 DrawController.drawEnemy(canvas, context, enemyList[i]);
             }
         };
-
 
         document.addEventListener('keydown', function (event) {
             switch (gameState) {
