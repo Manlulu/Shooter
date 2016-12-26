@@ -17,7 +17,20 @@ DrawController = {
         context.fillRect(laser.getPosX(), laser.getPosY(), laser.getWidth(), laser.getHeight());
     },
     drawEnemy: function(canvas, context, enemy){
+        context.beginPath();
         context.fillStyle = "#FFF";
         context.fillRect(enemy.getPosX(), enemy.getPosY(), enemy.getWidth(), enemy.getHeight());
+    },
+    drawMenuLine: function(context){
+        context.beginPath();
+        context.strokeStyle = "#FFF";
+        context.moveTo(0, 40);
+        context.lineTo(800,40);
+        context.stroke();
+    },
+    drawScore: function(context, score, highScore){
+        context.fillStyle = "#FFF";
+        context.font = "20px Verdana";
+        context.fillText("Score: " + score + "         HighScore: " + highScore, 20, 30);
     }
 };

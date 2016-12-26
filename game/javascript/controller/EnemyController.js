@@ -11,7 +11,7 @@ EnemyController = {
     },
     spawnEnemy: function (enemyList, timer) {
         if (timer <= 0 && enemyList.length < 4) {
-            enemyList.push(new Enemy(100, 30, 40, 10));
+            enemyList.push(new Enemy(-40, 50, 40, 10));
             timer = Math.floor(Math.random() * 200) + 100;
         }
         return timer;
