@@ -11,51 +11,56 @@ var Laser = function (startPosX, startPosY, canvas) {
     this.state = LaserState.MOVING;
     this.width = 3;
     this.height = 15;
+    this.shooter = null;
 
-    this.init = function(){
+    this.init = function () {
         this.desideShooter();
     };
 
-    this.desideShooter = function(){
-        this.shooter = this.posY > (this.canvas.height / 2) ? "Enemy" : "Player";
+    this.desideShooter = function () {
+        this.shooter = this.posY > (this.canvas.height / 2) ? "Player" : "Enemy";
+
     };
 
     this.init();
 
-    this.isOutOfScreen = function(){
+    this.isOutOfScreen = function () {
         return this.state == LaserState.OUT_OF_SCREEN;
     }
 
-    this.stateIsMoving = function(){
+    this.stateIsMoving = function () {
         return this.state == LaserState.MOVING;
     };
-    this.getState = function(){
+    this.getState = function () {
         return this.state;
     };
-    this.outOfScreen = function(){
+    this.outOfScreen = function () {
         this.state = LaserState.OUT_OF_SCREEN;
     };
-    this.hit = function(){
+    this.hit = function () {
         this.state = LaserState.HIT;
     };
-    this.getPosX = function(){
+    this.getPosX = function () {
         return this.posX;
     };
 
-    this.getPosY = function(){
+    this.getPosY = function () {
         return this.posY;
     };
 
-    this.setPosX = function(posX){
+    this.setPosX = function (posX) {
         this.posX = posX;
     };
-    this.setPosY = function(posY){
-        this.posY = posY;
+    this.setPosY = function (posY) {
+        // if (this.shooter == "Player")
+            this.posY = posY;
+        // else
+        //     this.posY = -posY;
     };
-    this.getWidth = function(){
+    this.getWidth = function () {
         return this.width;
-    }
-    this.getHeight = function(){
+    };
+    this.getHeight = function () {
         return this.height;
     }
 };
