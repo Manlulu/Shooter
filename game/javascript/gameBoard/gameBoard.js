@@ -14,8 +14,9 @@ var Game = function () {
     var enemyList = [];
     var enemyLaserList = [];
 
-    var audioPlayerShoot = new Audio("laser.mp3")
+    var playerLaserSound = new Audio("laser.mp3")
     var explosionSound = new Audio("explosion.mp3");
+    var enemyLaserSound = new Audio("laser2.mp3");
 
     var fpsInterval, startTime, now, then, timeSinceLastLoop;
 
@@ -104,6 +105,8 @@ var Game = function () {
                 console.log("Enemy: Pew pew");
                 enemyList[i].resetLoadTimer();
                 loadLaser(enemyLaserList, enemyList[i]);
+                AudioController.playSound(enemyLaserSound);
+
             }
         }
     };
@@ -157,7 +160,7 @@ var Game = function () {
     var updatePlayerFire = function () {
         if (playerState == PlayerState.FIRE && player.getAutoFireReady()) {
             player.fire();
-            AudioController.playSound(audioPlayerShoot);
+            AudioController.playSound(playerLaserSound);
 
             player.setAutoFireReady(false);
             resetAutoFireTimer();
