@@ -18,8 +18,9 @@ var Game = function () {
     var enemyLaserList = [];
 
     var playerLaserSound = new Audio("laser.mp3")
-    var explosionSound = new Audio("explosion.mp3");
+    var explosionSound = new Audio("explosion2.mp3");
     var enemyLaserSound = new Audio("laser2.mp3");
+    var playerDead = new Audio("big_explosion.mp3");
 
     var fpsInterval, startTime, now, then, timeSinceLastLoop;
 
@@ -113,6 +114,7 @@ var Game = function () {
                 (enemyLaserList[i].getPosY() + enemyLaserList[i].getHeight() >= player.getPosY() &&
                 enemyLaserList[i].getPosY() + enemyLaserList[i].getHeight() <= laserSpeed + player.getPosY())
             ) {
+                AudioController.playSound(playerDead);
                 resetGame();
             }
         }
