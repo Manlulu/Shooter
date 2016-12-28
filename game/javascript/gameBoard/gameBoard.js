@@ -9,6 +9,9 @@ var Game = function () {
     var score = 0;
     var lastHighscore = 0;
     var highScore = 0;
+    var laserSpeed = 4;
+    var animation;
+    var numberOfEnemies = 6;
 
     var laserList = [];
     var enemyList = [];
@@ -27,7 +30,10 @@ var Game = function () {
     const txtGameName = "Shooter game";
     const txtNewGame = "Press 'n' to start new game";
 
-    this.init = function (canvasId, context2d) {
+    var init = function (canvasId, context2d) {
+        laserList = [];
+        enemyList = [];
+        enemyLaserList = [];
         canvas = document.getElementById(canvasId);
         context = canvas.getContext(context2d);
         DrawController.resetCanvas(canvas, context);
@@ -40,21 +46,26 @@ var Game = function () {
 
         // Highscore
         lastHighscore = localStorage.getItem("shooter_score") || 0;
+        score = 0;
+        highScore = lastHighscore;
 
         // Finn ut mer om denne.
         // Sånn at den ikke fortsetter på det den dreiv å tegner på forrige loop.
         context.beginPath();
     };
 
-    this.startGame = function () {
+    var startGame = function () {
         if (gameState === State.PAUSE) {
             DrawController.drawText(context, txtGameName, "30px verdana", canvas.width / 3, canvas.height / 4, textColor);
             DrawController.drawText(context, txtNewGame, "20px verdana", canvas.width / 3.5, canvas.height / 3, textColor);
-            setTimeout(this.startGame.bind(this), 1000 / 2);
+            setTimeout(startGame.bind(this), 1000 / 2);
         } else {
             initGameLoop(60);
         }
     };
+
+    init("game_board", "2d");
+    startGame();
 
     function initGameLoop(fps) {
         fpsInterval = 1000 / fps;
@@ -64,7 +75,7 @@ var Game = function () {
     }
 
     var gameLoop = function () {
-        requestAnimationFrame(gameLoop);
+        animation = requestAnimationFrame(gameLoop);
 
         now = Date.now();
         timeSinceLastLoop = now - then;
@@ -88,7 +99,30 @@ var Game = function () {
 
         updateEnemy();
         checkLaserPosition(enemyLaserList);
-        updateLaserPosition(enemyLaserList, -4);
+        updateLaserPosition(enemyLaserList, -laserSpeed);
+
+        checkPlayerHitByEnemyLaser();
+    };
+
+    var checkPlayerHitByEnemyLaser = function () {
+        for (var i = 0; i < enemyLaserList.length; i++) {
+            if
+            (((enemyLaserList[i].getPosX() < player.getPosX() && enemyLaserList[i].getPosX() + enemyLaserList[i].getWidth() > player.getPosX()) ||
+                (enemyLaserList[i].getPosX() > player.getPosX() && enemyLaserList[i].getPosX() < player.getPosX() + player.getWidth()) ||
+                (enemyLaserList[i].getPosX() > player.getPosX() && enemyLaserList[i].getPosX() < player.getPosX() + player.getWidth())) &&
+                (enemyLaserList[i].getPosY() + enemyLaserList[i].getHeight() >= player.getPosY() &&
+                enemyLaserList[i].getPosY() + enemyLaserList[i].getHeight() <= laserSpeed + player.getPosY())
+            ) {
+                resetGame();
+            }
+        }
+    };
+
+    var resetGame = function () {
+        cancelAnimationFrame(animation);
+        DrawController.resetCanvas(canvas, context);
+        init("game_board", "2d");
+        startGame();
     };
 
     var updateEnemy = function () {
@@ -106,14 +140,13 @@ var Game = function () {
                 enemyList[i].resetLoadTimer();
                 loadLaser(enemyLaserList, enemyList[i]);
                 AudioController.playSound(enemyLaserSound);
-
             }
         }
     };
 
     var spawnEnemy = function () {
         enemySpawnTimer--;
-        enemySpawnTimer = EnemyController.spawnEnemy(enemyList, enemySpawnTimer);
+        enemySpawnTimer = EnemyController.spawnEnemy(enemyList, enemySpawnTimer, numberOfEnemies);
     };
 
     var checkEnemyHitByLaser = function () {
@@ -178,7 +211,6 @@ var Game = function () {
     var loadLaser = function (list, firedFrom) {
         list.push(new Laser((firedFrom.getPosX() + (firedFrom.getWidth() / 2)), firedFrom.getPosY(), canvas));
     };
-
 
     var resetAutoFireTimer = function () {
         autoFireTimer = 0;

@@ -9,8 +9,8 @@ EnemyController = {
         enemyList[pos] = null;
         enemyList.splice(pos, 1);
     },
-    spawnEnemy: function (enemyList, timer) {
-        if (timer <= 0 && enemyList.length < 4) {
+    spawnEnemy: function (enemyList, timer, numberOfEnemiesOnScreen) {
+        if (timer <= 0 && enemyList.length < numberOfEnemiesOnScreen) {
             enemyList.push(new Enemy(-40, 50, 40, 10));
             timer = Math.floor(Math.random() * 200) + 100;
         }
